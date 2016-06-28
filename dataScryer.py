@@ -41,9 +41,6 @@ def mainloop(job_config, live, histou, manager):
                     job_config[host] = {}
                 sv['config'] = config
                 job_config[host][service] = sv
-            else:
-                time.sleep(1)
-        break
     manager.update_config(job_config)
     return job_config
 
@@ -59,7 +56,7 @@ if __name__ == "__main__":
         stream=sys.stdout,
         level=Config.data['main']['log_level'],
         format='%(asctime)s %(name)-30s %(levelname)-8s %(message)s',
-        datefmt='%d-%m %H:%M',
+        datefmt='%d-%m-%S %H:%M',
     )
 
     MethodCollector([Config.data['main']['defaultMethods'], Config.data['main']['customMethods']])
