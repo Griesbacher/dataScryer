@@ -2,7 +2,7 @@
 Custom_Methods = custom_methods
 Default_Methods = datascryer/default_methods
 JSON_Schema = datascryer/histou/RuleSchema.json
-Log_Level  = DEBUG
+Log_Level  = INFO
 Daemon = FALSE
 Config_Updaterate_in_Minutes = 30
 Log_Performance = False
