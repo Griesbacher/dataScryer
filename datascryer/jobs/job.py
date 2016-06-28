@@ -2,6 +2,7 @@ import logging
 import math
 import threading
 import time
+from random import randint
 
 from datascryer.config import log_peformance
 from datascryer.helper.python import python_3, delta_ms
@@ -50,6 +51,9 @@ class Job(threading.Thread):
     def run(self):
         if len(self.__update_rates) == 0:
             return
+
+        # wait up to 20 seconds, to get some distortion
+        self.__stop_event.wait(randint(0, 20))
 
         while not self.__stop_event.is_set():
             start = time.time()
