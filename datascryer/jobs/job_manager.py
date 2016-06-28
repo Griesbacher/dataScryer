@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 
 from datascryer.jobs.job import Job
 
@@ -23,14 +24,18 @@ class JobManager:
                     jobs_to_start.append(desc)
                     self.__jobs[host][service] = dict(sv)
                 elif host in self.__jobs and service in self.__jobs[host] \
-                        and self.__jobs[host][service] != sv:
+                        and self.__jobs[host][service]['config'] != sv['config']:
                     # job is known but config has changed
+                    logging.getLogger(__name__).debug("%s %s has a new config: %s\nold config: %s" % (
+                        host, service, sv['config'], self.__jobs[host][service]['config']
+                    )
+                                                      )
                     job_to_stop.append((host, service, self.__jobs[host][service]))
                     jobs_to_start.append(desc)
                     self.__jobs[host][service] = dict(sv)
         for host, hv in self.__jobs.items():
             for service, sv in hv.items():
-                desc = (host, service, sv)
+                desc = (host, service, dict(sv))
                 if host not in config:
                     # job is outdated because no config for host exists
                     job_to_stop.append(desc)
@@ -38,8 +43,8 @@ class JobManager:
                     # job is outdated because no config for service exists
                     job_to_stop.append(desc)
 
-        self.__start_jobs(jobs_to_start)
         self.__stop_jobs(job_to_stop)
+        self.__start_jobs(jobs_to_start)
 
     @staticmethod
     def __stop_jobs(jobs):
@@ -54,7 +59,7 @@ class JobManager:
             return
         for j in jobs:
             logging.getLogger(__name__).debug("Starting job: %s %s" % (j[0], j[1]))
-            self.__jobs[j[0]][j[1]]['job'] = Job(j)
+            self.__jobs[j[0]][j[1]]['job'] = Job(deepcopy(j))
             self.__jobs[j[0]][j[1]]['job'].start()
 
     def stop(self):
