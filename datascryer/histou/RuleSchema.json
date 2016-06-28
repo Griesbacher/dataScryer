@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "label": {
+        "type": "string",
+        "description": "Performancelabel"
+      },
+      "method": {
+        "type": "string",
+        "description": "Method to calc forecast"
+      },
+      "methodSpecificOptions": {
+      },
+      "lookback_range": {
+        "type": "string",
+        "description": "Timebase for forecast",
+        "pattern": "^[0-9]+[smhw]$"
+      },
+      "forecast_range": {
+        "type": "string",
+        "description": "Time to predict",
+        "pattern": "^[0-9]+[smhw]$"
+      },
+      "forecast_interval": {
+        "type": "string",
+        "description": "Time between predicted points.",
+        "pattern": "^[0-9]+[smhw]$"
+      },
+      "update_rate": {
+        "type": "string",
+        "description": "Time between calculations.",
+        "pattern": "^[0-9]+[smhw]$"
+      }
+    },
+    "required": [
+      "label",
+      "method",
+      "methodSpecificOptions",
+      "lookback_range",
+      "forecast_range",
+      "forecast_interval",
+      "update_rate"
+    ]
+  }
+}

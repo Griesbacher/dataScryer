@@ -1,0 +1,25 @@
+[Main]
+Custom_Methods = custom_methods
+Default_Methods = datascryer/default_methods
+JSON_Schema = datascryer/histou/RuleSchema.json
+Log_Level  = DEBUG
+Daemon = FALSE
+Config_Updaterate_in_Minutes = 30
+Log_Performance = False
+
+[Livestatus]
+Address: tcp:127.0.0.1:6557
+#Address: unix:tmp/run/live
+
+[Histou]
+# http is much faster!
+#Address: file:/var/www/histou/rule_examinant.php
+Address: http:http://localhost/histou/rule_examinant.php
+
+[InfluxDB]
+Address_Read: http://127.0.0.1:8086
+DB_Read = nagflux
+DB_Read_Args = epoch=ms
+Address_Write: http://127.0.0.1:8086
+DB_Write = nagflux_forecast
+DB_Write_Args = precision=ms
