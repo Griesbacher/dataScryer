@@ -8,11 +8,6 @@ from datascryer.config import Config
 from datascryer.helper.http import get
 from datascryer.helper.python import python_3
 
-if python_3():
-    pass
-else:
-    pass
-
 
 class Histou:
     def __init__(self, protocol, address):
