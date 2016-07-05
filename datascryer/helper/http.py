@@ -29,10 +29,16 @@ def read(response):
         return response.read()
 
 
-def post(url, data):
+def post(url, data, json=False):
     if isinstance(data, str):
         data = data.encode('utf-8')
     if python_3():
-        return urllib.request.urlopen(url, data)
+        req = urllib.request.Request(url)
+        if json:
+            req.add_header('Content-Type', 'application/json; charset=utf-8')
+        return urllib.request.urlopen(req, data)
     else:
-        return urllib2.urlopen(urllib2.Request(url, data))
+        req = urllib2.Request(url, data)
+        if json:
+            req.add_header('Content-Type', 'application/json; charset=utf-8')
+        return urllib2.urlopen(req)
