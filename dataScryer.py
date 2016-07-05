@@ -25,22 +25,32 @@ def mainloop(job_config, live, histou, manager):
     host_services = live.get_host_services()
     if log_peformance():
         logging.getLogger(__name__).debug("Livestatusquery took: %dms" % delta_ms(l_start))
-    config = None
+
     for host, hv in host_services.items():
+        config_names = []
         for service, sv in hv.items():
-            try:
-                l_start = time.time()
-                config = histou.get_config(host=host, service=service, command=sv['command'],
-                                           perf_labels=sv['perf_labels'])
-            except URLError as error:
-                logging.getLogger(__name__).error("Could not connect to histou, to receive the config: " + str(error))
-            if config:
-                if log_peformance():
-                    logging.getLogger(__name__).debug("Histouquery took: %dms" % delta_ms(l_start))
-                if host not in job_config:
-                    job_config[host] = {}
-                sv['config'] = config
-                job_config[host][service] = sv
+            config_names.append(
+                {"host": host, "service": service, "command": sv['command'], "perf_labels": sv['perf_labels']}
+            )
+        host_service_config = None
+        try:
+            l_start = time.time()
+            host_service_config = histou.get_config(hosts_services=config_names)
+        except URLError as error:
+            logging.getLogger(__name__).error("Could not connect to histou, to receive the config: " + str(error),
+                                              exc_info=True)
+        if host_service_config:
+            if log_peformance():
+                logging.getLogger(__name__).debug("Histouquery took: %dms" % delta_ms(l_start))
+
+            i = 0
+            for service, sv in hv.items():
+                if host_service_config[i]:
+                    if host not in job_config:
+                        job_config[host] = {}
+                    sv['config'] = host_service_config[i]
+                    job_config[host][service] = sv
+                i += 1
     manager.update_config(job_config)
     return job_config
 
@@ -92,7 +102,7 @@ if __name__ == "__main__":
                     logging.getLogger(__name__).debug("Updating config took: %dms" % delta_ms(start))
                 time.sleep(Config.data['main']['update_rate'])
         except Exception as e:
-            logging.getLogger(__name__).fatal(str(e))
+            logging.getLogger(__name__).fatal(str(e), exc_info=True)
     else:
         logging.getLogger(__name__).info(
             "Running just once, and wait %ds to finish calculations" % TIME_FOR_CALCULATIONS
