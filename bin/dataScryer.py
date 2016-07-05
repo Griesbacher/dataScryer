@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import logging
 import sys
@@ -6,8 +8,8 @@ from datascryer.config import Config
 from datascryer.influxdb.reader import InfluxDBReader
 from datascryer.influxdb.writer import InfluxDBWriter
 from datascryer.methods.method_collector import MethodCollector
-from mode.check import check_mode
-from mode.drawing import forecast_mode
+from datascryer.mode.check import check_mode
+from datascryer.mode.drawing import forecast_mode
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Make forecasts based on performancedata')

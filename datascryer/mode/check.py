@@ -3,7 +3,7 @@ from datascryer.influxdb.reader import InfluxDBReader
 from datascryer.jobs.job import Job
 from datascryer.methods.abc_forecast import ForecastMethod
 from datascryer.methods.method_collector import MethodCollector
-from mode.returncodes import Returncodes
+from datascryer.mode.returncodes import Returncodes
 
 
 def check_mode(args):
