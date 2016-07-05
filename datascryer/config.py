@@ -32,7 +32,7 @@ class Config:
                              'schema': self.__settings.get('Main', 'JSON_Schema'),
                              'log_level': self.__settings.get('Main', 'Log_Level'),
                              'daemon': strtobool(self.__settings.get('Main', 'Daemon')),
-                             'update_rate': int(self.__settings.get('Main', 'Config_Updaterate_in_Minutes')),
+                             'update_rate': int(self.__settings.get('Main', 'Config_Updaterate_in_Minutes')) * 60,
                              'log_performance': strtobool(self.__settings.get('Main', 'Log_Performance'))}
 
         # Livestatus
