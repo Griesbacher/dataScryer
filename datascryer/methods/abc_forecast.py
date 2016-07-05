@@ -25,12 +25,15 @@ class ForecastMethod:
         raise NotImplementedError()
 
     @abstractmethod
-    def calc_intersection(self, min_x, y, lookback_data):
+    def calc_intersection(self, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data, y):
         """
         Returns the x value of the intersection of the given y and the estimated forecast function.
-        :param min_x: The minimum of x
+        :param forecast_start: timestamp to start forecast.
+        :param forecast_range: Time in seconds to forecast after start.
+        :param forecast_interval: Timeinterval to forecast.
+        :param lookback_range: Time in seconds of existing data.
+        :param lookback_data: Two dimensional array of data of existing data.
         :param y: Value to be reached.
-        :param lookback_data:
         :return:
         """
         raise NotImplementedError()
@@ -39,9 +42,13 @@ class ForecastMethod:
     def gen_forecast_data(func, forecast_start, forecast_range, forecast_interval):
         return [(x, func(x)) for x in xrange(forecast_start, forecast_start + forecast_range, forecast_interval)]
 
-    def gen_intersection(self, func, min_x, y):
-        x = func(y)
-        return self.INF if x < min_x else x
+    def gen_intersection(self, forecast_data, forecast_start, y):
+
+        for i in range(len(forecast_data) - 1):
+            if forecast_data[i][1] <= y <= forecast_data[i + 1][1] \
+                    or forecast_data[i][1] >= y >= forecast_data[i + 1][1]:
+                return forecast_data[i][0] - forecast_start
+        return self.INF
 
     @staticmethod
     def sum_x_y(data, power=1):

@@ -4,7 +4,6 @@ class Units:
     m = s * 60
     h = m * 60
     d = h * 24
-    w = d * 7
 
     @classmethod
     def fromstring(cls, string):
