@@ -42,8 +42,8 @@ class Config:
             self.data['livestatus']['port'] = int(livestatus_split[2])
 
         # Histou
-        histou_split = self.__settings.get('Histou', 'Address').split(":", 1)
-        self.data['histou'] = {'prot': histou_split[0], 'address': histou_split[1]}
+        # histou_split = self.__settings.get('Histou', 'Address').split(":", 1)
+        self.data['histou'] = {'prot': "http", 'address': self.__settings.get('Histou', 'Address')}
 
         # Influxdb
         self.data['influxdb'] = {'read': {'address': self.__settings.get('InfluxDB', 'Address_Read'),
