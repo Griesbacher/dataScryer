@@ -11,8 +11,14 @@ from datascryer.methods.method_collector import MethodCollector
 from datascryer.mode.check import check_mode
 from datascryer.mode.drawing import forecast_mode
 
+
+def get_version():
+    return "0.0.1.5"
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Make forecasts based on performancedata')
+    parser = argparse.ArgumentParser(description='Makes forecasts based on performancedata')
+    parser.add_argument("--version", action='version', version=get_version())
     required = parser.add_argument_group('required arguments')
     required.add_argument("-c", "--config", help="Path to the config file", required=True)
     check = parser.add_argument_group('CheckMode arguments')
@@ -44,7 +50,7 @@ if __name__ == "__main__":
         datefmt='%d-%m-%S %H:%M',
     )
 
-    MethodCollector([Config.data['main']['defaultMethods'], Config.data['main']['customMethods']])
+    MethodCollector([Config.data['main']['customMethods']])
 
     InfluxDBReader(address=Config.data['influxdb']['read']['address'],
                    db=Config.data['influxdb']['read']['db'],
