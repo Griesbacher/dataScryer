@@ -1,5 +1,11 @@
 import os
-from distutils.core import setup
+
+from bin.dataScryer import get_version
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 
 def package_files(directory):
@@ -13,10 +19,10 @@ def package_files(directory):
 extra_files = package_files('datascryer')
 
 setup(
-    version="0.0.1.1",
+    version=get_version(),
 
     name="DataScryer",
-    description="Framework to predict future performancedata.",
+    description="DataScryer - Framework to predict future performancedata.",
     author="Philip Griesbacher",
     author_email="philip.griesbacher@consol.de",
     url="https://github.com/Griesbacher/dataScryer",
@@ -27,6 +33,11 @@ setup(
 
     license="GPLv3",
     install_requires=[
-        "jsonschema",
+        "jsonschema"
     ],
+    classifiers=[
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+    ],
+    zip_safe=True
 )
