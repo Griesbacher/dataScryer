@@ -4,7 +4,6 @@ import logging
 import jsonschema
 
 import datascryer
-from datascryer.config import Config
 from datascryer.helper.http import get
 from datascryer.helper.python import python_3
 
@@ -13,8 +12,7 @@ class Histou:
     def __init__(self, protocol, address):
         self.protocol = protocol
         self.address = address
-        with open(Config.data['main']['schema']) as json_schema:
-            self.schema = json.load(json_schema)
+        self.schema = self.get_json_schema()
 
     def get_config(self, hosts_services):
         if self.protocol == "http":
@@ -38,9 +36,55 @@ class Histou:
                                                       exc_info=True)
         return json_object
 
-
-def _gen_url(url, host, service, command, perf_labels, url_quote):
-    url = url % (url_quote(host), url_quote(service), url_quote(command))
-    for p in perf_labels:
-        url += "&perf_label[]=" + url_quote(p)
-    return url
+    @staticmethod
+    def get_json_schema():
+        return """
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "label": {
+        "type": "string",
+        "description": "Performancelabel"
+      },
+      "method": {
+        "type": "string",
+        "description": "Method to calc forecast"
+      },
+      "methodSpecificOptions": {
+      },
+      "lookback_range": {
+        "type": "string",
+        "description": "Timebase for forecast",
+        "pattern": "^[0-9]+[smhw]$"
+      },
+      "forecast_range": {
+        "type": "string",
+        "description": "Time to predict",
+        "pattern": "^[0-9]+[smhw]$"
+      },
+      "forecast_interval": {
+        "type": "string",
+        "description": "Time between predicted points.",
+        "pattern": "^[0-9]+[smhw]$"
+      },
+      "update_rate": {
+        "type": "string",
+        "description": "Time between calculations.",
+        "pattern": "^[0-9]+[smhw]$"
+      }
+    },
+    "required": [
+      "label",
+      "method",
+      "methodSpecificOptions",
+      "lookback_range",
+      "forecast_range",
+      "forecast_interval",
+      "update_rate"
+    ]
+  }
+}
+"""
