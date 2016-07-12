@@ -28,8 +28,6 @@ class Config:
 
         # Main
         self.data['main'] = {'customMethods': self.__settings.get('Main', 'Custom_Methods'),
-                             'defaultMethods': self.__settings.get('Main', 'Default_Methods'),
-                             'schema': self.__settings.get('Main', 'JSON_Schema'),
                              'log_level': self.__settings.get('Main', 'Log_Level'),
                              'daemon': strtobool(self.__settings.get('Main', 'Daemon')),
                              'update_rate': int(self.__settings.get('Main', 'Config_Updaterate_in_Minutes')) * 60,
