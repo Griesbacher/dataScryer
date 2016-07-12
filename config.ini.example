@@ -1,7 +1,5 @@
 [Main]
-Custom_Methods = custom_methods
 Default_Methods = datascryer/default_methods
-JSON_Schema = datascryer/histou/RuleSchema.json
 Log_Level  = INFO
 Daemon = TRUE
 Config_Updaterate_in_Minutes = 30
@@ -15,9 +13,9 @@ Address: tcp:127.0.0.1:6557
 Address: http://localhost/histou/rule_examinant.php
 
 [InfluxDB]
-Address_Read: http://127.0.0.1:8086
+Address_Read = http://127.0.0.1:8086
 DB_Read = nagflux
 DB_Read_Args = epoch=ms
-Address_Write: http://127.0.0.1:8086
+Address_Write = http://127.0.0.1:8086
 DB_Write = nagflux_forecast
 DB_Write_Args = precision=ms
