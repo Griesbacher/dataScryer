@@ -32,5 +32,5 @@ class MethodCollector:
                                     print(c[0] + " does not implement ForecastMethod")
                     except Exception as e:
                         logging.getLogger(__name__).critical("Loading method failed: " + str(e))
-            except FileNotFoundError as f:
+            except Exception as f:
                         logging.getLogger(__name__).critical(f)

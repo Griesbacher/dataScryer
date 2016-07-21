@@ -1,7 +1,5 @@
 import os
 
-from bin.dataScryer import get_version
-
 try:
     from setuptools import setup
 except ImportError:
@@ -19,7 +17,7 @@ def package_files(directory):
 extra_files = package_files('datascryer')
 
 setup(
-    version=get_version(),
+    version="0.0.1.6",
 
     name="DataScryer",
     description="DataScryer - Framework to predict future performancedata.",
