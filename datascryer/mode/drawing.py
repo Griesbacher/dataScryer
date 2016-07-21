@@ -14,7 +14,7 @@ else:
     from urllib2 import URLError
 
 
-def forecast_mode(time_for_calculations=3):
+def forecast_mode(time_for_calculations=10):
     if Config.data['livestatus']['protocol'] == "tcp":
         l = livestatus.Connector(
             ip=(Config.data['livestatus']['address'], Config.data['livestatus']['port']))

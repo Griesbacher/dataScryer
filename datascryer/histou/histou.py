@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import subprocess
 
 import jsonschema
 
@@ -12,17 +14,24 @@ class Histou:
     def __init__(self, protocol, address):
         self.protocol = protocol
         self.address = address
-        self.schema = self.get_json_schema()
+        self.schema = json.loads(self.get_json_schema())
 
     def get_config(self, hosts_services):
+        json_config = json.dumps(hosts_services)
         if self.protocol == "http":
-            json_config = json.dumps(hosts_services)
             response = datascryer.helper.http.post(self.address, json_config, json=True)
 
             if response.code != 200:
                 Exception("Returncode is not 200: " + response.code)
 
             out = response.read()
+        elif self.protocol == "file":
+            current_dir = os.path.dirname(os.path.realpath(os.getcwd()))
+            folder = os.path.split(self.address)[0:-1][0]
+            cmd = ["php", os.path.basename(self.address), "--request=" + json_config]
+            os.chdir(folder)
+            out = subprocess.check_output(cmd)
+            os.chdir(current_dir)
         else:
             logging.getLogger(__name__).error("Undefined Protocol: " + self.protocol)
             return None
