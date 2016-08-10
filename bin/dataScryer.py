@@ -46,9 +46,10 @@ if __name__ == "__main__":
     logging.basicConfig(
         stream=sys.stdout,
         level=Config.data['main']['log_level'],
-        format='%(asctime)s %(name)-30s %(levelname)-8s %(message)s',
+        format='%(asctime)s %(name)-40s %(levelname)-8s %(message)s',
         datefmt='%d-%m-%S %H:%M',
     )
+    logging.captureWarnings(True)
 
     MethodCollector([Config.data['main']['customMethods']])
 

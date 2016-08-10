@@ -31,7 +31,7 @@ setup(
 
     license="GPLv3",
     install_requires=[
-        "jsonschema"
+        "jsonschema", 'requests'
     ],
     classifiers=[
         'Programming Language :: Python :: 2',

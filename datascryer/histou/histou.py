@@ -4,13 +4,15 @@ import os
 import subprocess
 
 import jsonschema
-
-import datascryer
-from datascryer.helper.http import get
-from datascryer.helper.python import python_3
+import requests
 
 
 class Histou:
+    POST_HEADER = {
+        'User-Agent': "It's me, wget!",
+        "Content-Type": "application/json"
+    }
+
     def __init__(self, protocol, address):
         self.protocol = protocol
         self.address = address
@@ -19,23 +21,26 @@ class Histou:
     def get_config(self, hosts_services):
         json_config = json.dumps(hosts_services)
         if self.protocol == "http":
-            response = datascryer.helper.http.post(self.address, json_config, json=True)
+            # Disable SSL verification warning
+            requests.packages.urllib3.disable_warnings()
+            r = requests.post(url=self.address, data=json_config, auth=('omdadmin', 'omd'),
+                              verify=False, headers=Histou.POST_HEADER)
 
-            if response.code != 200:
-                Exception("Returncode is not 200: " + response.code)
+            if r.status_code != 200:
+                Exception("Returncode is not 200: " + r.status_code)
 
-            out = response.read()
+            out = r.text
         elif self.protocol == "file":
             current_dir = os.path.dirname(os.path.realpath(os.getcwd()))
             folder = os.path.split(self.address)[0:-1][0]
             cmd = ["php", os.path.basename(self.address), "--request=" + json_config]
             os.chdir(folder)
-            out = subprocess.check_output(cmd)
+            out = subprocess.check_output(cmd).decode('utf8')
             os.chdir(current_dir)
         else:
             logging.getLogger(__name__).error("Undefined Protocol: " + self.protocol)
             return None
-        json_object = json.loads(out.decode('utf8'))
+        json_object = json.loads(out)
         for o in json_object:
             if o:
                 try:
