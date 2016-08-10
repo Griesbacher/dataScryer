@@ -17,6 +17,7 @@ UPDATE_RATE = 'update_rate'
 LOOKBACK_RANGE = 'lookback_range'
 FORECAST_RANGE = 'forecast_range'
 FORECAST_INTERVAL = 'forecast_interval'
+METHOD_OPTIONS = 'methodSpecificOptions'
 
 TIME_KEYS = [UPDATE_RATE, LOOKBACK_RANGE, FORECAST_RANGE, FORECAST_INTERVAL]
 
@@ -82,7 +83,8 @@ class Job(threading.Thread):
             )
         start = time.time()
         forecast_data = MethodCollector.classes[self.get_method(conf)]. \
-            calc_forecast(forecast_start=self.calc_start_date(lookback_data[len(lookback_data) - 1][0],
+            calc_forecast(options=conf[METHOD_OPTIONS],
+                          forecast_start=self.calc_start_date(lookback_data[len(lookback_data) - 1][0],
                                                               conf[FORECAST_INTERVAL]),
                           forecast_range=conf[FORECAST_RANGE],
                           forecast_interval=conf[FORECAST_INTERVAL],

@@ -12,9 +12,10 @@ class ForecastMethod:
         INF = float("inf")
 
     @abstractmethod
-    def calc_forecast(self, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data):
+    def calc_forecast(self, options, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data):
         """
         Generates an array bases on the given data.
+        :param options: dict with whatever the config passes.
         :param forecast_start: timestamp to start forecast.
         :param forecast_range: Time in seconds to forecast after start.
         :param forecast_interval: Timeinterval to forecast.
@@ -25,9 +26,11 @@ class ForecastMethod:
         raise NotImplementedError()
 
     @abstractmethod
-    def calc_intersection(self, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data, y):
+    def calc_intersection(self, options, forecast_start, forecast_range, forecast_interval,
+                          lookback_range, lookback_data, y):
         """
         Returns the x value of the intersection of the given y and the estimated forecast function.
+        :param options: dict with whatever the config passes.
         :param forecast_start: timestamp to start forecast.
         :param forecast_range: Time in seconds to forecast after start.
         :param forecast_interval: Timeinterval to forecast.

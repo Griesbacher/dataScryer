@@ -14,7 +14,7 @@ class SimpleLinearRegression(ForecastMethod):
         else:
             return lambda x: b * x + a, lambda y: (y - a) / b
 
-    def calc_forecast(self, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data):
+    def calc_forecast(self, options, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data):
         return self.gen_forecast_data(
             func=self.calc_slr(lookback_data=lookback_data)[0],
             forecast_start=forecast_start,
@@ -22,7 +22,8 @@ class SimpleLinearRegression(ForecastMethod):
             forecast_interval=forecast_interval
         )
 
-    def calc_intersection(self, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data, y):
+    def calc_intersection(self, options, forecast_start, forecast_range, forecast_interval,
+                          lookback_range, lookback_data, y):
         return self.gen_intersection(
             self.gen_forecast_data(
                 func=self.calc_slr(lookback_data=lookback_data)[0],

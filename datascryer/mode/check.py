@@ -29,6 +29,8 @@ def check_mode(args):
         plugin_exit(Returncodes.Unknown, "Could not fetch data from InfluxDB")
     result = MethodCollector.classes[method]. \
         calc_intersection(
+        # TODO: if needed add args
+        options={},
         forecast_start=Job.calc_start_date(
             lookback_data[len(lookback_data) - 1][0],
             forecast_interval),
