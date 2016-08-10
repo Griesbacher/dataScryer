@@ -17,7 +17,7 @@ def package_files(directory):
 extra_files = package_files('datascryer')
 
 setup(
-    version="0.0.1.6",
+    version="0.0.1",
 
     name="DataScryer",
     description="DataScryer - Framework to predict future performancedata.",
