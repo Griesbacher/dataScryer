@@ -43,6 +43,8 @@ class Config:
         # self.data['histou'] = {'prot': "http", 'address': self.__settings.get('Histou', 'Address')}
         histou_split = self.__settings.get('Histou', 'Address').split(":", 1)
         self.data['histou'] = {'prot': histou_split[0], 'address': histou_split[1]}
+        self.data['histou']['user'] = self.__settings.get('Histou', 'User')
+        self.data['histou']['password'] = self.__settings.get('Histou', 'Password')
 
         # Influxdb
         self.data['influxdb'] = {'read': {'address': self.__settings.get('InfluxDB', 'Address_Read'),

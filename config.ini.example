@@ -10,7 +10,10 @@ Address: tcp:127.0.0.1:6557
 #Address: unix:tmp/run/live
 
 [Histou]
-Address: http://localhost/histou/rule_examinant.php
+Address: http:https://localhost/sitename/histou/rule_examinant.php
+#Address: file:C:/xampp7/htdocs/histou/rule_examinant.php
+User: omdadmin
+Password: omd
 
 [InfluxDB]
 Address_Read = http://127.0.0.1:8086

@@ -6,6 +6,8 @@ import subprocess
 import jsonschema
 import requests
 
+from datascryer.config import Config
+
 
 class Histou:
     POST_HEADER = {
@@ -17,13 +19,14 @@ class Histou:
         self.protocol = protocol
         self.address = address
         self.schema = json.loads(self.get_json_schema())
+        # Disable SSL verification warning
+        requests.packages.urllib3.disable_warnings()
 
     def get_config(self, hosts_services):
         json_config = json.dumps(hosts_services)
         if self.protocol == "http":
-            # Disable SSL verification warning
-            requests.packages.urllib3.disable_warnings()
-            r = requests.post(url=self.address, data=json_config, auth=('omdadmin', 'omd'),
+            r = requests.post(url=self.address, data=json_config,
+                              auth=(Config.data['histou']['user'], Config.data['histou']['password']),
                               verify=False, headers=Histou.POST_HEADER)
 
             if r.status_code != 200:
