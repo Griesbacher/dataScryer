@@ -7,6 +7,12 @@ import jsonschema
 import requests
 
 from datascryer.config import Config
+from datascryer.helper.python import python_3
+
+if python_3():
+    from urllib.error import URLError
+else:
+    from urllib2 import URLError
 
 
 class Histou:
@@ -28,9 +34,8 @@ class Histou:
             r = requests.post(url=self.address, data=json_config,
                               auth=(Config.data['histou']['user'], Config.data['histou']['password']),
                               verify=False, headers=Histou.POST_HEADER)
-
             if r.status_code != 200:
-                Exception("Returncode is not 200: " + r.status_code)
+                raise URLError("Returncode is not 200: " + str(r.status_code))
 
             out = r.text
         elif self.protocol == "file":

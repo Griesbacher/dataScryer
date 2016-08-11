@@ -52,35 +52,47 @@ def forecast_mode(time_for_calculations=10):
 
 
 def mainloop(job_config, live, histou, manager):
-    l_start = time.time()
-    host_services = live.get_host_services()
-    if log_peformance():
-        logging.getLogger(__name__).debug("Livestatusquery took: %dms" % delta_ms(l_start))
-
-    for host, hv in host_services.items():
-        config_names = []
-        for service, sv in hv.items():
-            config_names.append(
-                {"host": host, "service": service, "command": sv['command'], "perf_labels": sv['perf_labels']}
-            )
-        host_service_config = None
+    while True:
         try:
             l_start = time.time()
-            host_service_config = histou.get_config(hosts_services=config_names)
-        except URLError as error:
-            logging.getLogger(__name__).error("Could not connect to histou, to receive the config: " + str(error),
-                                              exc_info=True)
-        if host_service_config:
-            if log_peformance():
-                logging.getLogger(__name__).debug("Histouquery took: %dms" % delta_ms(l_start))
+            try:
+                host_services = live.get_host_services()
+            except Exception as e:
+                logging.getLogger(__name__).error("Could not connect to livestatus: " + str(e))
+                time.sleep(10)
+                continue
 
-            i = 0
-            for service, sv in hv.items():
-                if host_service_config[i]:
-                    if host not in job_config:
-                        job_config[host] = {}
-                    sv['config'] = host_service_config[i]
-                    job_config[host][service] = sv
-                i += 1
-    manager.update_config(job_config)
-    return job_config
+            if log_peformance():
+                logging.getLogger(__name__).debug("Livestatusquery took: %dms" % delta_ms(l_start))
+
+            for host, hv in host_services.items():
+                config_names = []
+                for service, sv in hv.items():
+                    config_names.append(
+                        {"host": host, "service": service, "command": sv['command'], "perf_labels": sv['perf_labels']}
+                    )
+                host_service_config = None
+
+                l_start = time.time()
+                host_service_config = histou.get_config(hosts_services=config_names)
+
+                if host_service_config:
+                    if log_peformance():
+                        logging.getLogger(__name__).debug("Histouquery took: %dms" % delta_ms(l_start))
+
+                    i = 0
+                    for service, sv in hv.items():
+                        if host_service_config[i]:
+                            if host not in job_config:
+                                job_config[host] = {}
+                            sv['config'] = host_service_config[i]
+                            job_config[host][service] = sv
+                        i += 1
+            manager.update_config(job_config)
+            return job_config
+        except (URLError, ValueError) as e:
+            logging.getLogger(__name__).error("Could not connect to histou, to receive the config: " + str(e))
+            time.sleep(10)
+        except Exception as e:
+            logging.getLogger(__name__).error(str(e), exc_info=True)
+            time.sleep(10)

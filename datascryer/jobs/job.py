@@ -11,6 +11,11 @@ from datascryer.influxdb.reader import InfluxDBReader
 from datascryer.influxdb.writer import InfluxDBWriter
 from datascryer.methods.method_collector import MethodCollector
 
+if python_3():
+    from urllib.error import URLError
+else:
+    from urllib2 import URLError
+
 METHOD = 'method'
 LABEL = 'label'
 UPDATE_RATE = 'update_rate'
@@ -53,8 +58,8 @@ class Job(threading.Thread):
         if len(self.__update_rates) == 0:
             return
 
-        # wait up to 20 seconds, to get some distortion
-        self.__stop_event.wait(randint(0, 20))
+        # wait up to 120 seconds, to get some distortion
+        self.__stop_event.wait(randint(0, 120))
 
         while not self.__stop_event.is_set():
             start = time.time()
@@ -65,7 +70,12 @@ class Job(threading.Thread):
                 interrupt = self.__stop_event.wait(time_to_wait)
                 if interrupt:
                     return
-                self.start_calculation(update[1])
+                try:
+                    self.start_calculation(update[1])
+                except URLError as e:
+                    logging.getLogger(__name__).error("Could not connect to InfluxDB: " + str(e))
+                except:
+                    logging.getLogger(__name__).error("Job execution failed", exc_info=True)
 
     def start_calculation(self, conf):
         start = time.time()
