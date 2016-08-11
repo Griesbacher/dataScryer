@@ -23,6 +23,7 @@ class InfluxDBWriter:
             self.create_database()
         except URLError as e:
             logging.getLogger(__name__).error("Could not create database or connect to influxdb: " + str(e))
+            raise ConnectionError
 
     @staticmethod
     def write(data, host, service, performance_label, command=None):

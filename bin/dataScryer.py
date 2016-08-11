@@ -4,6 +4,8 @@ import argparse
 import logging
 import sys
 
+import time
+
 from datascryer.config import Config
 from datascryer.influxdb.reader import InfluxDBReader
 from datascryer.influxdb.writer import InfluxDBWriter
@@ -57,9 +59,15 @@ if __name__ == "__main__":
                    db=Config.data['influxdb']['read']['db'],
                    args=Config.data['influxdb']['read']['args']
                    )
-    InfluxDBWriter(address=Config.data['influxdb']['write']['address'],
-                   db=Config.data['influxdb']['write']['db'],
-                   args=Config.data['influxdb']['write']['args'])
+    influxdb_ready = False
+    while not influxdb_ready:
+        try:
+            InfluxDBWriter(address=Config.data['influxdb']['write']['address'],
+                           db=Config.data['influxdb']['write']['db'],
+                           args=Config.data['influxdb']['write']['args'])
+            influxdb_ready = True
+        except:
+            time.sleep(10)
 
     if args.check:
         check_mode(args=args)
