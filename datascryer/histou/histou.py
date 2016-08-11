@@ -80,22 +80,22 @@ class Histou:
       "lookback_range": {
         "type": "string",
         "description": "Timebase for forecast",
-        "pattern": "^[0-9]+[smhw]$"
+        "pattern": "^[0-9]+[smhd]$"
       },
       "forecast_range": {
         "type": "string",
         "description": "Time to predict",
-        "pattern": "^[0-9]+[smhw]$"
+        "pattern": "^[0-9]+[smhd]$"
       },
       "forecast_interval": {
         "type": "string",
         "description": "Time between predicted points.",
-        "pattern": "^[0-9]+[smhw]$"
+        "pattern": "^[0-9]+[smhd]$"
       },
       "update_rate": {
         "type": "string",
         "description": "Time between calculations.",
-        "pattern": "^[0-9]+[smhw]$"
+        "pattern": "^[0-9]+[smhd]$"
       }
     },
     "required": [
