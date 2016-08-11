@@ -15,7 +15,7 @@ from datascryer.mode.drawing import forecast_mode
 
 
 def get_version():
-    return "0.0.1"
+    return "0.0.2"
 
 
 if __name__ == "__main__":
