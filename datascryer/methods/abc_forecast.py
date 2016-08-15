@@ -46,7 +46,6 @@ class ForecastMethod:
         return [(x, func(x)) for x in xrange(forecast_start, forecast_start + forecast_range, forecast_interval)]
 
     def gen_intersection(self, forecast_data, forecast_start, y):
-
         for i in range(len(forecast_data) - 1):
             if forecast_data[i][1] <= y <= forecast_data[i + 1][1] \
                     or forecast_data[i][1] >= y >= forecast_data[i + 1][1]:

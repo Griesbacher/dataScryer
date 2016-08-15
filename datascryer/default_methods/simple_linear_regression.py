@@ -44,9 +44,9 @@ def example_wiki():
     data_y = [52.21, 53.12, 54.48, 55.84, 57.20, 58.57, 59.93, 61.29, 63.11, 64.47, 66.28, 68.10, 69.92, 72.19, 74.46]
     data = list(zip(data_x, data_y))
     s = SimpleLinearRegression()
-    forecast = s.calc_forecast({}, 1.70, 0.3, 0.05, len(data), data)
-    print(forecast)
     start = 1.70
+    forecast = s.calc_forecast({}, start, 0.3, 0.05, len(data), data)
+    print(forecast)
     y = 80
     x = s.calc_intersection({}, start, 0.4, 0.05, len(data), data, y)
     print(x)
