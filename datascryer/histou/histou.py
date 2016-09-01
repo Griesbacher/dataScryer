@@ -3,7 +3,6 @@ import logging
 import os
 import subprocess
 
-import jsonschema
 import requests
 
 from datascryer.config import Config
@@ -50,12 +49,16 @@ class Histou:
             return None
         json_object = json.loads(out)
         for o in json_object:
-            if o:
+            if o and not self.check_json_object(o[0]):
+                return None
+                """
+                leave jsonschema due to python 2.6 problems
                 try:
                     jsonschema.validate(o, self.schema)
                 except jsonschema.exceptions.ValidationError as e:
                     logging.getLogger(__name__).error("JSON Config received from Histou is not valid: " + str(e),
                                                       exc_info=True)
+                """
         return json_object
 
     @staticmethod
@@ -110,3 +113,14 @@ class Histou:
   }
 }
 """
+
+    @staticmethod
+    def check_json_object(obj):
+        required_keys = ['label', 'method', 'methodSpecificOptions', 'lookback_range', 'forecast_range',
+                         'forecast_interval', 'update_rate']
+        for key in required_keys:
+            if key not in obj.keys():
+                logging.getLogger(__name__).error("JSON Config received from Histou is not valid: " + str(obj),
+                                                  exc_info=True)
+                return False
+        return True

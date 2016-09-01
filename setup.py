@@ -17,7 +17,7 @@ def package_files(directory):
 extra_files = package_files('datascryer')
 
 setup(
-    version="0.0.2",
+    version="0.0.3",
 
     name="DataScryer",
     description="DataScryer - Framework to predict future performancedata.",
@@ -31,7 +31,7 @@ setup(
 
     license="GPLv3",
     install_requires=[
-        "jsonschema", 'requests'
+        'requests',
     ],
     classifiers=[
         'Programming Language :: Python :: 2',
