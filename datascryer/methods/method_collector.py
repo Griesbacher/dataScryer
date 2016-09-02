@@ -8,11 +8,17 @@ from datascryer.methods.abc_forecast import ForecastMethod
 
 
 class MethodCollector:
-    BUILD_IN = [SimpleLinearRegression]
     classes = dict()
 
     def __init__(self, folders):
-        for m in MethodCollector.BUILD_IN:
+        build_in = [SimpleLinearRegression]
+        try:
+            from datascryer.default_methods.holt_winters import HoltWinters
+            build_in.append(HoltWinters)
+        except Exception as e:
+            logging.getLogger(__name__).critical(str(e))
+
+        for m in build_in:
             MethodCollector.classes[str.lower(m.__name__)] = m()
 
         for folder in folders:
@@ -33,4 +39,4 @@ class MethodCollector:
                     except Exception as e:
                         logging.getLogger(__name__).critical("Loading method failed: " + str(e))
             except Exception as f:
-                        logging.getLogger(__name__).critical(f)
+                logging.getLogger(__name__).critical(f)
