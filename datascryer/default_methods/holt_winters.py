@@ -174,7 +174,7 @@ class HoltWinters(ForecastMethod):
         add_forecast, add_m, add_rmse = self.find_min_rmse(series, self.additive, fc)
         mul_forecast, mul_m, mul_rmse = self.find_min_rmse(series, self.multiplicative, fc)
         # damped_forecast, damped_m, damped_rmse = self.find_min_rmse(series, self.damped, fc)
-        # print(linear_rmse, add_rmse, mul_rmse)
+        print(linear_rmse, add_rmse, mul_rmse)
         min_rmse = min(linear_rmse, add_rmse, mul_rmse)
         if min_rmse == linear_rmse:
             return linear_forecast, 1, linear_rmse, 'linear'
@@ -185,7 +185,18 @@ class HoltWinters(ForecastMethod):
         else:
             raise Exception("This should not happen")
 
-    def calc_forecast(self, options, forecast_start, forecast_range, forecast_interval, lookback_range, lookback_data):
+    @staticmethod
+    def trim_data(data, resolution):
+        return [numpy.average(i) for i in numpy.array_split(data, resolution)]
+
+    @staticmethod
+    def expand_data(forecast, start, end, resolution):
+        step = (end - start) / resolution
+        x_forecast = [end + y * step for y in range(len(forecast))]
+        return list(zip(x_forecast, forecast))
+
+    def calc_forecast(self, options, __forecast_start, forecast_range, __forecast_interval, lookback_range,
+                      lookback_data):
         resolution = 100
         if 'resolution' in options:
             resolution = options['resolution']
@@ -193,39 +204,41 @@ class HoltWinters(ForecastMethod):
         # calc logical forecast length
         start = lookback_data[0][0]
         end = lookback_data[len(lookback_data) - 1][0]
-        forecast_length_simple = resolution * (forecast_range / lookback_range)
+        forecast_length_simple = round(resolution * (forecast_range / lookback_range))
 
         raw_data = []
         for d in lookback_data:
             raw_data.append(d[1])
 
+        trimmed_data = self.trim_data(raw_data, resolution)
+
+        # import matplotlib.pyplot as plt
+        # plt.plot(trimmed_data, label="v")
+        # plt.show()
         forecast = None
         if 'mode' in options:
             if options['mode'] == 'linear':
-                forecast, _, _, rmse = self.linear(raw_data, forecast_length_simple)
+                forecast, _, _, rmse = self.linear(x=trimmed_data, fc=forecast_length_simple)
                 logging.getLogger(__name__).debug("Name: linear, RMSE: " + str(rmse))
             elif options['mode'] == 'additive':
-                forecast, m, rmse = self.find_min_rmse(raw_data, self.additive, forecast_length_simple)
+                forecast, m, rmse = self.find_min_rmse(trimmed_data, self.additive, forecast_length_simple)
                 logging.getLogger(__name__).debug("Name: additive," + "Season: " + str(m) + ", RMSE: " + str(rmse))
             elif options['mode'] == 'multiplicative':
-                forecast, m, rmse = self.find_min_rmse(raw_data, self.multiplicative, forecast_length_simple)
+                forecast, m, rmse = self.find_min_rmse(trimmed_data, self.multiplicative, forecast_length_simple)
                 logging.getLogger(__name__).debug(
                     "Name: multiplicative," + "Season: " + str(m) + ", RMSE: " + str(rmse)
                 )
             else:
                 logging.getLogger(__name__).warning("Unkown mode: " + str(options['mode']))
         else:
-            forecast, m, rmse, name = self.find_best_function(raw_data, forecast_length_simple)
+            forecast, m, rmse, name = self.find_best_function(trimmed_data, forecast_length_simple)
             logging.getLogger(__name__).debug("Name: " + name + "Season: " + str(m) + ", RMSE: " + str(rmse))
 
         if not forecast:
             logging.getLogger(__name__).warning("no forecast was made")
             return None
 
-        step = int(lookback_range / len(lookback_data))
-        x_forecast = [end + y * step for y in range(len(forecast))]
-        r = list(zip(x_forecast, forecast))
-        return r
+        return self.expand_data(forecast, start, end, resolution)
 
     def calc_intersection(self, options, forecast_start, forecast_range, forecast_interval, lookback_range,
                           lookback_data, y):
@@ -260,6 +273,18 @@ def print_forecast(series, forecast=None, m=None, typ=None):
         print("Forecast: ", forecast)
 
 
+def print_real(series):
+    forecast = HoltWinters().calc_forecast({}, 0, int(len(series) / 2), 0, len(series), series)
+    try:
+        import matplotlib.pyplot as plt
+        plt.plot(*zip(*series), label="v")
+        plt.plot(*zip(*forecast), label="f")
+        plt.show()
+    except:
+        print("Data: ", series)
+        print("Forecast: ", forecast)
+
+
 def sinus_example():
     # additive
     series = []
@@ -268,12 +293,23 @@ def sinus_example():
     print_forecast(series)
 
 
+def real_sinus_example():
+    series = []
+    i = 0
+    for v in range(round(math.pi * 4.5 * 10)):
+        series.append((i, math.sin(v / 10) + 1))
+        i += 2
+    print_real(series)
+
+
 def trunc_example():
     # additive
     series = []
-    for i in range(round(math.pi * 4.5 * 10)):
-        series.append(math.trunc(i / 10))
-    print_forecast(series)
+    i = 0
+    for v in range(round(math.pi * 4.5 * 10)):
+        series.append((i, math.trunc(i / 10)))
+        i += 2
+    print_real(series)
 
 
 def log_example():
@@ -284,5 +320,12 @@ def log_example():
     print_forecast(series)
 
 
+def ssh():
+    import pandas as pd
+    df = pd.DataFrame(pd.read_csv('ssh.csv', sep=';'))[:20000]
+    series = list(zip(df.time.as_matrix(), df.value.as_matrix()))
+    print_real(series)
+
+
 if __name__ == '__main__':
-    sinus_example()
+    pass
