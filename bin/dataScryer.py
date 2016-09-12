@@ -3,8 +3,9 @@
 import argparse
 import logging
 import sys
-
 import time
+import traceback
+import warnings
 
 from datascryer.config import Config
 from datascryer.influxdb.reader import InfluxDBReader
@@ -16,6 +17,15 @@ from datascryer.mode.drawing import forecast_mode
 
 def get_version():
     return "0.0.3"
+
+
+_old_warn = warnings.warn
+
+
+def warn(*args, **kwargs):
+    tb = traceback.extract_stack()
+    _old_warn(*args, **kwargs)
+    print("".join(traceback.format_list(tb)[:-1]))
 
 
 if __name__ == "__main__":
@@ -49,8 +59,10 @@ if __name__ == "__main__":
         stream=sys.stdout,
         level=Config.data['main']['log_level'],
         format='%(asctime)s %(name)-40s %(levelname)-8s %(message)s',
-        datefmt='%d-%m-%S %H:%M',
+        datefmt='%d-%m-%Y %H:%M:%S',
     )
+
+    # warnings.warn = warn
     logging.captureWarnings(True)
 
     MethodCollector([Config.data['main']['customMethods']])
