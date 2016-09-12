@@ -187,7 +187,11 @@ class HoltWinters(ForecastMethod):
 
     @staticmethod
     def trim_data(data, resolution):
-        return [numpy.average(i) for i in numpy.array_split(data, resolution)]
+        r = []
+        for i in numpy.array_split(data, resolution):
+            if len(i) > 0:
+                r.append(numpy.average(i))
+        return r
 
     @staticmethod
     def expand_data(forecast, start, end, resolution):
@@ -195,7 +199,7 @@ class HoltWinters(ForecastMethod):
         x_forecast = [end + y * step for y in range(len(forecast))]
         return list(zip(x_forecast, forecast))
 
-    def calc_forecast(self, options, __forecast_start, forecast_range, __forecast_interval, lookback_range,
+    def calc_forecast(self, options, forecast_start, forecast_range, forecast_interval, lookback_range,
                       lookback_data):
         resolution = 100
         if 'resolution' in options:
@@ -231,8 +235,11 @@ class HoltWinters(ForecastMethod):
             else:
                 logging.getLogger(__name__).warning("Unkown mode: " + str(options['mode']))
         else:
-            forecast, m, rmse, name = self.find_best_function(trimmed_data, forecast_length_simple)
-            logging.getLogger(__name__).debug("Name: " + name + "Season: " + str(m) + ", RMSE: " + str(rmse))
+            try:
+                forecast, m, rmse, name = self.find_best_function(trimmed_data, forecast_length_simple)
+                logging.getLogger(__name__).debug("Name: " + name + "Season: " + str(m) + ", RMSE: " + str(rmse))
+            except Exception as e:
+                logging.getLogger(__name__).warn(str(e))
 
         if not forecast:
             logging.getLogger(__name__).warning("no forecast was made")
