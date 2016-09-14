@@ -51,7 +51,8 @@ class Config:
                                           'db': self.__settings.get('InfluxDB', 'DB_Read'),
                                           'args': self.__settings.get('InfluxDB', 'DB_Read_Args')},
                                  'write': {'address': self.__settings.get('InfluxDB', 'Address_Write'),
-                                           'db': self.__settings.get('InfluxDB', 'DB_Write'),
+                                           'db_forecast': self.__settings.get('InfluxDB', 'DB_Write_Forecast'),
+                                           'db_anomaly': self.__settings.get('InfluxDB', 'DB_Write_Anomaly'),
                                            'args': self.__settings.get('InfluxDB', 'DB_Write_Args')}}
 
 

@@ -75,10 +75,12 @@ if __name__ == "__main__":
     while not influxdb_ready:
         try:
             InfluxDBWriter(address=Config.data['influxdb']['write']['address'],
-                           db=Config.data['influxdb']['write']['db'],
+                           db_forecast=Config.data['influxdb']['write']['db_forecast'],
+                           db_anomaly=Config.data['influxdb']['write']['db_anomaly'],
                            args=Config.data['influxdb']['write']['args'])
             influxdb_ready = True
-        except:
+        except Exception as e:
+            logging.getLogger(__name__).debug("waiting for InfluxDB: "+ str(e))
             time.sleep(10)
 
     if args.check:

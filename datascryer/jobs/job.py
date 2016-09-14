@@ -92,30 +92,64 @@ class Job(threading.Thread):
                     self.__host, self.__service, conf[LABEL], self.get_method(conf), delta_ms(start))
             )
         start = time.time()
-        forecast_data = MethodCollector.classes[self.get_method(conf)]. \
-            calc_forecast(options=conf[METHOD_OPTIONS],
-                          forecast_start=self.calc_start_date(lookback_data[len(lookback_data) - 1][0],
-                                                              conf[FORECAST_INTERVAL]),
-                          forecast_range=conf[FORECAST_RANGE],
-                          forecast_interval=conf[FORECAST_INTERVAL],
-                          lookback_range=conf[LOOKBACK_RANGE],
-                          lookback_data=lookback_data)
-        if log_peformance():
-            logging.getLogger(__name__).debug(
-                "Calculation data of %s %s %s: %s took %dms" % (
-                    self.__host, self.__service, conf[LABEL], self.get_method(conf), delta_ms(start))
-            )
-        start = time.time()
-        InfluxDBWriter.write(forecast_data,
-                             host=self.__host,
-                             service=self.__service,
-                             # command=self.__command,
-                             performance_label=conf[LABEL])
-        if log_peformance():
-            logging.getLogger(__name__).debug(
-                "Writing data of %s %s %s: %s took %dms" % (
-                    self.__host, self.__service, conf[LABEL], self.get_method(conf), delta_ms(start))
-            )
+        my_class = MethodCollector.classes[self.get_method(conf)]
+        if 'calc_forecast' in dir(my_class):
+            forecast_data = my_class. \
+                calc_forecast(options=conf[METHOD_OPTIONS],
+                              forecast_start=self.calc_start_date(lookback_data[len(lookback_data) - 1][0],
+                                                                  conf[FORECAST_INTERVAL]),
+                              forecast_range=conf[FORECAST_RANGE],
+                              forecast_interval=conf[FORECAST_INTERVAL],
+                              lookback_range=conf[LOOKBACK_RANGE],
+                              lookback_data=lookback_data)
+            if log_peformance():
+                logging.getLogger(__name__).debug(
+                    "Calculation data of %s %s %s: %s took %dms" % (
+                        self.__host, self.__service, conf[LABEL], self.get_method(conf), delta_ms(start))
+                )
+            start = time.time()
+            if forecast_data:
+                InfluxDBWriter.write_forecast(data=forecast_data,
+                                              host=self.__host,
+                                              service=self.__service,
+                                              # command=self.__command,
+                                              performance_label=conf[LABEL])
+                if log_peformance():
+                    logging.getLogger(__name__).debug(
+                        "Writing data of %s %s %s: %s took %dms" % (
+                            self.__host, self.__service, conf[LABEL], self.get_method(conf), delta_ms(start))
+                    )
+            else:
+                logging.getLogger(__name__).debug(
+                    "Calculation did not return any data: %s %s %s: %s" % (
+                        self.__host, self.__service, conf[LABEL], self.get_method(conf))
+                )
+        elif 'search_anomaly' in dir(my_class):
+            anomaly_data = my_class.search_anomaly(
+                options=conf[METHOD_OPTIONS],
+                lookback_range=conf[LOOKBACK_RANGE],
+                lookback_data=lookback_data)
+            if log_peformance():
+                logging.getLogger(__name__).debug(
+                    "Calculation data of %s %s %s: %s took %dms" % (
+                        self.__host, self.__service, conf[LABEL], self.get_method(conf), delta_ms(start))
+                )
+            if anomaly_data:
+                InfluxDBWriter.write_anomaly(data=anomaly_data,
+                                             host=self.__host,
+                                             service=self.__service,
+                                             # command=self.__command,
+                                             performance_label=conf[LABEL])
+                if log_peformance():
+                    logging.getLogger(__name__).debug(
+                        "Writing data of %s %s %s: %s took %dms" % (
+                            self.__host, self.__service, conf[LABEL], self.get_method(conf), delta_ms(start))
+                    )
+            else:
+                logging.getLogger(__name__).debug(
+                    "Calculation did not return any data: %s %s %s: %s" % (
+                        self.__host, self.__service, conf[LABEL], self.get_method(conf))
+                )
 
     @staticmethod
     def get_method(c):

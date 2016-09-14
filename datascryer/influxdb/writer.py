@@ -13,20 +13,27 @@ else:
 
 
 class InfluxDBWriter:
-    url = None
-
-    def __init__(self, address, db, args):
-        InfluxDBWriter.db = db
-        InfluxDBWriter.url = gen_url(address, db, args, "write")
-        InfluxDBWriter.url_query = gen_clean_url(address, "query")
+    def __init__(self, address, db_forecast, db_anomaly, args):
+        InfluxDBWriter.url_forecast = gen_url(address, db_forecast, args, "write")
+        InfluxDBWriter.url_anomaly = gen_url(address, db_anomaly, args, "write")
+        self.url_query = gen_clean_url(address, "query")
         try:
-            self.create_database()
+            self.create_database(db_forecast)
+            self.create_database(db_anomaly)
         except URLError as e:
             logging.getLogger(__name__).error("Could not create database or connect to influxdb: " + str(e))
             raise ConnectionError
 
     @staticmethod
-    def write(data, host, service, performance_label, command=None):
+    def write_forecast(data, host, service, performance_label, command=None):
+        InfluxDBWriter._write(data, InfluxDBWriter.url_forecast, host, service, performance_label, command)
+
+    @staticmethod
+    def write_anomaly(data, host, service, performance_label, command=None):
+        InfluxDBWriter._write(data, InfluxDBWriter.url_anomaly, host, service, performance_label, command)
+
+    @staticmethod
+    def _write(data, url, host, service, performance_label, command=None):
         line_data = StringIO()
         b = None
         for line in data:
@@ -46,16 +53,15 @@ class InfluxDBWriter:
             line_data.write("\n")
         try:
             b = line_data.getvalue().encode('utf-8')
-            datascryer.helper.http.post(InfluxDBWriter.url, b)
+            datascryer.helper.http.post(url, b)
         except Exception as e:
             logging.getLogger(__name__).warn(e)
-            logging.getLogger(__name__).warn(InfluxDBWriter.url)
+            logging.getLogger(__name__).warn(url)
             if b:
                 logging.getLogger(__name__).warn(b)
 
-    @staticmethod
-    def create_database():
+    def create_database(self, db):
         datascryer.helper.http.post(
-            InfluxDBWriter.url_query,
-            "q=" + datascryer.helper.http.quote("CREATE DATABASE " + InfluxDBWriter.db)
+            self.url_query,
+            "q=" + datascryer.helper.http.quote("CREATE DATABASE " + db)
         )

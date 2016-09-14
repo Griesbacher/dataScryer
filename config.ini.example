@@ -20,5 +20,6 @@ Address_Read = http://127.0.0.1:8086
 DB_Read = nagflux
 DB_Read_Args = epoch=ms
 Address_Write = http://127.0.0.1:8086
-DB_Write = nagflux_forecast
+DB_Write_Forecast = nagflux_forecast
+DB_Write_Anomaly = nagflux_anomaly
 DB_Write_Args = precision=ms
