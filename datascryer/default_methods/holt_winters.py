@@ -174,7 +174,7 @@ class HoltWinters(ForecastMethod):
         add_forecast, add_m, add_rmse = self.find_min_rmse(series, self.additive, fc)
         mul_forecast, mul_m, mul_rmse = self.find_min_rmse(series, self.multiplicative, fc)
         # damped_forecast, damped_m, damped_rmse = self.find_min_rmse(series, self.damped, fc)
-        print(linear_rmse, add_rmse, mul_rmse)
+        logging.getLogger(__name__).debug("%d, %d, %d" %(linear_rmse, add_rmse, mul_rmse))
         min_rmse = min(linear_rmse, add_rmse, mul_rmse)
         if min_rmse == linear_rmse:
             return linear_forecast, 1, linear_rmse, 'linear'
@@ -216,9 +216,6 @@ class HoltWinters(ForecastMethod):
 
         trimmed_data = self.trim_data(raw_data, resolution)
 
-        # import matplotlib.pyplot as plt
-        # plt.plot(trimmed_data, label="v")
-        # plt.show()
         forecast = None
         if 'mode' in options:
             if options['mode'] == 'linear':
@@ -245,7 +242,10 @@ class HoltWinters(ForecastMethod):
             logging.getLogger(__name__).warning("no forecast was made")
             return None
 
-        return self.expand_data(forecast, start, end, resolution)
+        if len(lookback_data) > resolution:
+            return self.expand_data(forecast, start, end, resolution)
+        else:
+            return self.expand_data(forecast, start, end, len(lookback_data))
 
     def calc_intersection(self, options, forecast_start, forecast_range, forecast_interval, lookback_range,
                           lookback_data, y):
