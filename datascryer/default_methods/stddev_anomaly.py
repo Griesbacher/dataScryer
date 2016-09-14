@@ -1,5 +1,6 @@
 import numpy
 
+from datascryer.default_methods.holt_winters import HoltWinters
 from datascryer.methods.abc_anomaly import AnomalyMethod
 
 
@@ -52,6 +53,9 @@ class StddevAnomaly(AnomalyMethod):
         sma = 10
         if 'sma' in options:
             sma = options['sma']
+
+        if 'resolution' in options:
+            raw_data = HoltWinters().trim_data(raw_data, options['resolution'])
 
         m = StddevAnomaly().sma(raw_data, sma)
         y = StddevAnomaly().chop_for_sma(raw_data, sma)
