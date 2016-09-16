@@ -174,7 +174,7 @@ class HoltWinters(ForecastMethod):
         add_forecast, add_m, add_rmse = self.find_min_rmse(series, self.additive, fc)
         mul_forecast, mul_m, mul_rmse = self.find_min_rmse(series, self.multiplicative, fc)
         # damped_forecast, damped_m, damped_rmse = self.find_min_rmse(series, self.damped, fc)
-        logging.getLogger(__name__).debug("%d, %d, %d" %(linear_rmse, add_rmse, mul_rmse))
+        logging.getLogger(__name__).debug("RMSEs: %d, %d, %d" % (linear_rmse, add_rmse, mul_rmse))
         min_rmse = min(linear_rmse, add_rmse, mul_rmse)
         if min_rmse == linear_rmse:
             return linear_forecast, 1, linear_rmse, 'linear'
