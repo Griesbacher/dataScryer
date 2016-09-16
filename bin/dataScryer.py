@@ -16,7 +16,7 @@ from datascryer.mode.drawing import forecast_mode
 
 
 def get_version():
-    return "0.0.3"
+    return "0.0.4"
 
 
 _old_warn = warnings.warn
